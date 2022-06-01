@@ -14,5 +14,22 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return sendResponse(
+        'Welcome to the Laravel API',
+        [
+            'data' => [
+                'version' => '1.0.0',
+                'author' => 'Touficul Islam'
+            ]
+        ]
+    );
 });
+
+
+Route::get('/unauthorized', function () {
+    return sendError(
+        'Unauthorized',
+        [
+        'error' => trans('Unauthorized Attempt')
+    ],\Symfony\Component\HttpFoundation\Response::HTTP_UNAUTHORIZED);
+})->name('unauthorized');
