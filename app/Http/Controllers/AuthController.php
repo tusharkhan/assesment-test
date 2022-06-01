@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
@@ -32,7 +33,7 @@ class AuthController extends Controller
             return $this->respondWithToken($token);
         }
 
-        return response()->json(['error' => 'Unauthorized'], 401);
+        return sendError('Unauthorized', [], Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -42,7 +43,11 @@ class AuthController extends Controller
      */
     public function me()
     {
-        return response()->json($this->guard()->user());
+        return sendResponse(
+            'Data retrieved successfully',
+            $this->guard()->user(),
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -54,7 +59,11 @@ class AuthController extends Controller
     {
         $this->guard()->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return sendResponse(
+            'Successfully logged out',
+            [],
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -76,11 +85,15 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token)
     {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => $this->guard()->factory()->getTTL() * 60
-        ]);
+        return sendResponse(
+            'Successfully logged in',
+            [
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => $this->guard()->factory()->getTTL() * 7*24*60,
+                'user' => $this->guard()->user()
+            ],
+        );
     }
 
     /**
