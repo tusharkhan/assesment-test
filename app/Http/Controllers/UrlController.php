@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GenerateUrlRequest;
 use App\Models\Url;
+use AshAllenDesign\ShortURL\Classes\Builder;
+use AshAllenDesign\ShortURL\Facades\ShortURL;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,16 +23,21 @@ class UrlController extends Controller
 
     public function generateUrl(GenerateUrlRequest $generateUrlRequest)
     {
+        $port = $generateUrlRequest->getPort();
         $slug = Str::random(10);
         $insertData = [
             'link' => $generateUrlRequest->get('link')
         ];
 
+        $mainUrl = $insertData['link'];
+
         if ($generateUrlRequest->has('slug')) {
             $slug = $generateUrlRequest->get('slug');
 
-            $insertData['slug'] = $slug;
+            $mainUrl = $generateUrlRequest->get('link') . '/' . $slug;
         }
+
+        $insertData['slug'] = $slug;
 
         $existingUrl = Url::where($insertData)->first();
 
@@ -38,35 +45,46 @@ class UrlController extends Controller
             $insertData['created_at'] = date('Y-m-d H:i:s');
             $insertData['updated_at'] = date('Y-m-d H:i:s');
 
-            if ( ! Auth::check() ){
-                $insertData['shortened_url'] = $insertData['link'] . '/' . $slug;
+            $shortLink = env('APP_URL') . '/redirect/' . $slug;
+            if ( $port ){
+                $shortLink = env('APP_URL') . ':' . $port . '/redirect/' . $slug;
+            }
 
-                insertIntoTable('urls', $insertData);
+
+            $insertData['shortened_url'] = $shortLink;
+            $insertData['main_url']      = $mainUrl;
+
+            insertIntoTable('urls', $insertData);
 
                 return sendResponse(
                     'Generate a short URL',
-                    $insertData,
+                    [
+                        'link' => $insertData['shortened_url']
+                    ],
                     Response::HTTP_CREATED
                 );
-            }
+
         } else {
             return sendResponse(
                 'Generate a short URL',
-                $existingUrl,
+                [
+                    'link' => $existingUrl->shortened_url
+                ],
                 Response::HTTP_OK
             );
         }
-
-        return null;
     }
 
 
-    private function storeIntoUrlTable($slug)
+    public function redirectUrl($slug)
     {
-        $insertData = [
-            'slug' => $slug,
-            'link' => request()->query('link'),
-            'user_id' => Auth::id(),
-        ];
+        $url = Url::where('slug', $slug)->first();
+
+        if ($url) {
+            return redirect($url->main_url);
+        } else {
+            return redirect(env('APP_URL'));
+        }
+
     }
 }

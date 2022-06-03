@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
@@ -44,6 +45,11 @@ class Handler extends ExceptionHandler
         if ($e instanceof NotFoundHttpException) {
             return sendError(
                 'Not Found',
+                ['error' => ['The requested URL was not found on this server.']],
+                Response::HTTP_NOT_FOUND);
+        } else if( $e instanceof MethodNotAllowedHttpException ){
+            return sendError(
+                'Bad Method',
                 ['error' => ['The requested URL was not found on this server.']],
                 Response::HTTP_NOT_FOUND);
         }

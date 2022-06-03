@@ -37,3 +37,4 @@ Route::get('api/unauthorized', function () {
 
 
 Route::post('api/generate', [UrlController::class, 'generateUrl'])->name('generate');
+Route::get('redirect/{slug}', [UrlController::class, 'redirectUrl'])->name('redirect');

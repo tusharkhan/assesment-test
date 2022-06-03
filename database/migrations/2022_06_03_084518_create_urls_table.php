@@ -18,6 +18,7 @@ class CreateUrlsTable extends Migration
             $table->string('slug')->nullable();
             $table->string('link');
             $table->string('shortened_url')->nullable();
+            $table->string('main_url');
             $table->timestamps();
         });
     }
