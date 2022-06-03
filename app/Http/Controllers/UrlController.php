@@ -4,23 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GenerateUrlRequest;
 use App\Models\Url;
-use AshAllenDesign\ShortURL\Classes\Builder;
-use AshAllenDesign\ShortURL\Facades\ShortURL;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class UrlController extends Controller
 {
-    public function unAuthUrl()
-    {
-        return sendResponse(
-            'Generate a short URL',
-            env('APP_URL') . '/' . Str::random(10)
-        );
-    }
-
-
     public function generateUrl(GenerateUrlRequest $generateUrlRequest)
     {
         $port = $generateUrlRequest->getPort();
