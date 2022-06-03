@@ -50,7 +50,7 @@ class Handler extends ExceptionHandler
         } else if( $e instanceof MethodNotAllowedHttpException ){
             return sendError(
                 'Bad Method',
-                ['error' => ['The requested URL was not found on this server.']],
+                ['error' => ['Method not allowed']],
                 Response::HTTP_NOT_FOUND);
         }
 
