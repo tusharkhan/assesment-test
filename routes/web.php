@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UrlController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,10 +27,14 @@ Route::get('/', function () {
 });
 
 
-Route::get('/unauthorized', function () {
+Route::get('api/unauthorized', function () {
     return sendError(
         'Unauthorized',
         [
         'error' => trans('Unauthorized Attempt')
     ],\Symfony\Component\HttpFoundation\Response::HTTP_UNAUTHORIZED);
 })->name('unauthorized');
+
+
+Route::post('api/generate', [UrlController::class, 'generateUrl'])->name('generate');
+Route::get('redirect/{slug}', [UrlController::class, 'redirectUrl'])->name('redirect');

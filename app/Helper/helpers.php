@@ -6,6 +6,8 @@
  */
 
 
+use Illuminate\Support\Facades\DB;
+
 if ( ! function_exists('sendResponse') ){
     /**
      * @param $message
@@ -46,5 +48,18 @@ if ( ! function_exists('sendError') ){
         ];
 
         return response()->json($response, $code);
+    }
+}
+
+
+if ( ! function_exists('insertIntoTable') ){
+    /**
+     * @param $table
+     * @param $data
+     * @return bool
+     */
+    function insertIntoTable($table, $data)
+    {
+        return DB::table($table)->insert($data);
     }
 }
